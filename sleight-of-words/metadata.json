@@ -1,0 +1,6 @@
+{
+  "name": "Sleight of Words",
+  "description": "Mobile word puzzle game featuring Seams, Splits, Charades, Hangman, and Daily Tricks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
