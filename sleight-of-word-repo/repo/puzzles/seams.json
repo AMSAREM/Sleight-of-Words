@@ -1,0 +1,44 @@
+[
+  {
+    "id": "seams_0001",
+    "mode": "seams",
+    "difficulty": 1,
+    "sentence": "The crab earned a shiny medal.",
+    "answer": "BEAR",
+    "accepted_answers": ["BEAR"],
+    "explanation": "The letters run from the end of “crab” into the start of “earned”.",
+    "tags": ["animal", "4-letter"],
+    "status": "draft",
+    "reviewed_by": null,
+    "daily_date": null,
+    "seams": { "word_index_a": 1, "word_index_b": 2, "split_at": 1, "hidden_extras": [] }
+  },
+  {
+    "id": "seams_0002",
+    "mode": "seams",
+    "difficulty": 1,
+    "sentence": "The ship landed at dawn.",
+    "answer": "PLAN",
+    "accepted_answers": ["PLAN"],
+    "explanation": "The last letter of “ship” joins the start of “landed”.",
+    "tags": ["4-letter"],
+    "status": "draft",
+    "reviewed_by": null,
+    "daily_date": null,
+    "seams": { "word_index_a": 1, "word_index_b": 2, "split_at": 1, "hidden_extras": [] }
+  },
+  {
+    "id": "seams_0003",
+    "mode": "seams",
+    "difficulty": 2,
+    "sentence": "We wash airy curtains weekly.",
+    "answer": "HAIR",
+    "accepted_answers": ["HAIR"],
+    "explanation": "The last letter of “wash” joins the start of “airy”.",
+    "tags": ["body", "4-letter"],
+    "status": "draft",
+    "reviewed_by": null,
+    "daily_date": null,
+    "seams": { "word_index_a": 1, "word_index_b": 2, "split_at": 1, "hidden_extras": [] }
+  }
+]

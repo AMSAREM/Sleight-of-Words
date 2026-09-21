@@ -1,0 +1,68 @@
+[
+  {
+    "id": "splits_0001",
+    "mode": "splits",
+    "difficulty": 2,
+    "sentence": "The children adored the carpet.",
+    "answer": "CAR PET",
+    "accepted_answers": ["CAR PET"],
+    "explanation": "Add a space after “car” and the floor covering becomes a “car pet”.",
+    "tags": ["household"],
+    "status": "draft",
+    "reviewed_by": null,
+    "daily_date": null,
+    "splits": {
+      "word_index": 4,
+      "original_word": "carpet",
+      "split_positions": [3],
+      "accepted_splits": [["car", "pet"]],
+      "altered_sentence": "The children adored the car pet.",
+      "meaning_changed": true,
+      "decoys": {}
+    }
+  },
+  {
+    "id": "splits_0002",
+    "mode": "splits",
+    "difficulty": 2,
+    "sentence": "The camper looked intent.",
+    "answer": "IN TENT",
+    "accepted_answers": ["IN TENT"],
+    "explanation": "“Intent” becomes “in tent”: the camper is no longer focused, just inside the tent.",
+    "tags": ["outdoors"],
+    "status": "draft",
+    "reviewed_by": null,
+    "daily_date": null,
+    "splits": {
+      "word_index": 3,
+      "original_word": "intent",
+      "split_positions": [2],
+      "accepted_splits": [["in", "tent"]],
+      "altered_sentence": "The camper looked in tent.",
+      "meaning_changed": true,
+      "decoys": {}
+    }
+  },
+  {
+    "id": "splits_0003",
+    "mode": "splits",
+    "difficulty": 3,
+    "sentence": "After a long search, the keys were nowhere.",
+    "answer": "NOW HERE",
+    "accepted_answers": ["NOW HERE"],
+    "explanation": "“Nowhere” becomes “now here”: the keys go from lost to found.",
+    "tags": ["everyday"],
+    "status": "draft",
+    "reviewed_by": null,
+    "daily_date": null,
+    "splits": {
+      "word_index": 7,
+      "original_word": "nowhere",
+      "split_positions": [3],
+      "accepted_splits": [["now", "here"]],
+      "altered_sentence": "After a long search, the keys were now here.",
+      "meaning_changed": true,
+      "decoys": { "2": "That reads the same as before. Try a space that changes the meaning." }
+    }
+  }
+]
