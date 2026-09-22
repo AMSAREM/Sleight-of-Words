@@ -15,6 +15,9 @@ import { HangmanGame } from './components/HangmanGame';
 import { DailyTrickModal } from './components/DailyTrickModal';
 import { HowToPlayModal } from './components/HowToPlayModal';
 import { SpecValidatorModal } from './components/SpecValidatorModal';
+import { SettingsModal } from './components/SettingsModal';
+import { ShopModal } from './components/ShopModal';
+import { DailyGiftModal } from './components/DailyGiftModal';
 import { sound } from './utils/audio';
 import { DailyStreakData, loadDailyStreak, recordPuzzleSolveForStreak } from './utils/streak';
 
@@ -29,6 +32,13 @@ const getInitialStats = (): PlayerStats => {
       const parsed = JSON.parse(raw);
       // Reset hearts to 3 on new session
       parsed.hearts = 3;
+      parsed.consecutiveSolves = parsed.consecutiveSolves || 0;
+      parsed.maxConsecutiveSolves = parsed.maxConsecutiveSolves || 0;
+      parsed.claimedAchievementIds = parsed.claimedAchievementIds || [];
+      parsed.flashlights = parsed.flashlights ?? 5;
+      parsed.musicEnabled = parsed.musicEnabled ?? true;
+      parsed.vibrationEnabled = parsed.vibrationEnabled ?? true;
+      parsed.language = parsed.language || 'English';
       if (parsed.dailyProgress?.date !== todayStr) {
         parsed.dailyProgress = {
           date: todayStr,
@@ -46,6 +56,13 @@ const getInitialStats = (): PlayerStats => {
     coins: 30,
     gems: 25,
     hearts: 3,
+    flashlights: 5,
+    musicEnabled: true,
+    vibrationEnabled: true,
+    language: 'English',
+    consecutiveSolves: 0,
+    maxConsecutiveSolves: 0,
+    claimedAchievementIds: [],
     levelProgress: {},
     dailyProgress: {
       date: todayStr,
@@ -97,6 +114,44 @@ export const App: React.FC = () => {
   const [isDailyOpen, setIsDailyOpen] = useState<boolean>(false);
   const [isValidatorOpen, setIsValidatorOpen] = useState<boolean>(false);
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState<boolean>(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  const [isShopOpen, setIsShopOpen] = useState<boolean>(false);
+  const [isDailyGiftOpen, setIsDailyGiftOpen] = useState<boolean>(false);
+
+  const handleAddCurrency = (reward: { coins?: number; gems?: number; flashlights?: number }) => {
+    setStats((prev) => ({
+      ...prev,
+      coins: prev.coins + (reward.coins || 0),
+      gems: prev.gems + (reward.gems || 0),
+      flashlights: (prev.flashlights || 0) + (reward.flashlights || 0)
+    }));
+  };
+
+  const handleToggleMusic = () => {
+    setStats((prev) => {
+      const next = !prev.musicEnabled;
+      if (next) {
+        sound.startThemeSong();
+      } else {
+        sound.stopThemeSong();
+      }
+      return { ...prev, musicEnabled: next };
+    });
+  };
+
+  const handleToggleVibration = () => {
+    setStats((prev) => ({
+      ...prev,
+      vibrationEnabled: !prev.vibrationEnabled
+    }));
+  };
+
+  const handleSelectLanguage = (lang: string) => {
+    setStats((prev) => ({
+      ...prev,
+      language: lang
+    }));
+  };
 
   // Persist stats to localStorage
   useEffect(() => {
@@ -138,10 +193,28 @@ export const App: React.FC = () => {
 
   // Actions
   const handleLoseHeart = () => {
-    setStats((prev) => ({
-      ...prev,
-      hearts: Math.max(0, prev.hearts - 1)
-    }));
+    setStats((prev) => {
+      const nextHearts = Math.max(0, prev.hearts - 1);
+      return {
+        ...prev,
+        hearts: nextHearts,
+        // Reset streak on loss of all hearts
+        consecutiveSolves: nextHearts === 0 ? 0 : (prev.consecutiveSolves || 0)
+      };
+    });
+  };
+
+  const handleClaimAchievement = (achievementId: string, reward: { coins: number; gems: number }) => {
+    setStats((prev) => {
+      const alreadyClaimed = (prev.claimedAchievementIds || []).includes(achievementId);
+      if (alreadyClaimed) return prev;
+      return {
+        ...prev,
+        coins: prev.coins + (reward.coins || 0),
+        gems: prev.gems + (reward.gems || 0),
+        claimedAchievementIds: [...(prev.claimedAchievementIds || []), achievementId]
+      };
+    });
   };
 
   const handlePuzzleSolved = (stars: number, hintsUsed: number, wrongGuesses: number) => {
@@ -169,10 +242,16 @@ export const App: React.FC = () => {
     const { streak: updatedStreak } = recordPuzzleSolveForStreak();
     setDailyStreak(updatedStreak);
 
+    // Track consecutive solves for achievements
+    const nextConsecutive = (stats.consecutiveSolves || 0) + 1;
+    const bestConsecutive = Math.max(stats.maxConsecutiveSolves || 0, nextConsecutive);
+
     setStats((prev) => ({
       ...prev,
       coins: prev.coins + earnedCoins,
       gems: prev.gems + earnedGems,
+      consecutiveSolves: nextConsecutive,
+      maxConsecutiveSolves: bestConsecutive,
       levelProgress: updatedProgress,
       dailyProgress: updatedDaily
     }));
@@ -307,6 +386,9 @@ export const App: React.FC = () => {
           dailyStreak={dailyStreak}
           isMuted={isMuted}
           onToggleMute={handleToggleMute}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenShop={() => setIsShopOpen(true)}
+          onOpenDailyGift={() => setIsDailyGiftOpen(true)}
           onOpenAuth={() => setIsAuthOpen(true)}
           onOpenHowToPlay={() => setIsHowToPlayOpen(true)}
           onOpenDaily={() => setIsDailyOpen(true)}
@@ -315,6 +397,7 @@ export const App: React.FC = () => {
           onGoToLaunch={() => setActiveView('launch')}
           onStartMode={handleSelectMode}
           onQuickPlay={handleQuickPlay}
+          onClaimAchievement={handleClaimAchievement}
         />
       )}
 
@@ -476,7 +559,7 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* Confetti & 3-Star Victory Overlay */}
+      {/* Confetti & 3-Star Victory Overlay (Screen 3 reference) */}
       {victoryData && (
         <VictoryOverlay
           isOpen={victoryData.isOpen}
@@ -488,6 +571,16 @@ export const App: React.FC = () => {
           explanation={victoryData.explanation}
           isDailyMode={isDailyMode}
           currentStreak={dailyStreak.currentStreak}
+          levelTitle={
+            currentMode === 'seams'
+              ? 'Carnival Seams'
+              : currentMode === 'splits'
+              ? 'Split Alley'
+              : currentMode === 'charades'
+              ? 'Grand Charades'
+              : 'Gallows Chamber'
+          }
+          levelIndex={activeIndex + 1}
           onNext={handleNextPuzzle}
           onReplay={handleReplayPuzzle}
           onGoToMap={() => {
@@ -500,6 +593,37 @@ export const App: React.FC = () => {
           }}
         />
       )}
+
+      {/* Settings Modal (Screen 1 reference) */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        isMuted={isMuted}
+        onToggleMute={handleToggleMute}
+        musicEnabled={stats.musicEnabled ?? true}
+        onToggleMusic={handleToggleMusic}
+        vibrationEnabled={stats.vibrationEnabled ?? true}
+        onToggleVibration={handleToggleVibration}
+        language={stats.language || 'English'}
+        onSelectLanguage={handleSelectLanguage}
+      />
+
+      {/* Shop Modal (Screen 2 reference) */}
+      <ShopModal
+        isOpen={isShopOpen}
+        onClose={() => setIsShopOpen(false)}
+        coins={stats.coins}
+        gems={stats.gems}
+        flashlights={stats.flashlights ?? 5}
+        onAddCurrency={handleAddCurrency}
+      />
+
+      {/* Daily Gift Modal (Screen 6 reference) */}
+      <DailyGiftModal
+        isOpen={isDailyGiftOpen}
+        onClose={() => setIsDailyGiftOpen(false)}
+        onClaimGift={handleAddCurrency}
+      />
 
       {/* Auth / Profile Modal */}
       <AuthModal

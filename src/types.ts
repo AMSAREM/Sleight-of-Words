@@ -117,6 +117,11 @@ export interface PlayerStats {
   coins: number;
   gems: number;
   hearts: number; // 0 to 3
+  flashlights?: number; // Magic Lanterns / Hint Wands (illuminates hidden word seams)
+  soundEnabled?: boolean;
+  musicEnabled?: boolean;
+  vibrationEnabled?: boolean;
+  language?: string;
   levelProgress: Record<string, {
     stars: number; // 0 to 3
     solved: boolean;
@@ -134,4 +139,31 @@ export interface PlayerStats {
     draws: number;
     totalMatches: number;
   };
+  consecutiveSolves?: number;
+  maxConsecutiveSolves?: number;
+  claimedAchievementIds?: string[];
+}
+
+export type AchievementCategory = 'all' | 'streak' | 'mastery' | 'modes' | 'special';
+
+export interface AchievementDefinition {
+  id: string;
+  title: string;
+  description: string;
+  category: 'streak' | 'mastery' | 'modes' | 'special';
+  target: number;
+  badgeEmoji: string;
+  badgeIcon: 'flame' | 'eye' | 'layers' | 'star' | 'trophy' | 'sparkles' | 'swords' | 'split' | 'crown' | 'calendar' | 'coins';
+  badgeColor: string; // Theme accent hex
+  reward: {
+    coins: number;
+    gems: number;
+  };
+}
+
+export interface AchievementProgress extends AchievementDefinition {
+  current: number;
+  isUnlocked: boolean;
+  isClaimed: boolean;
+  progressPercent: number;
 }
